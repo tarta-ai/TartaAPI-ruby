@@ -42,7 +42,7 @@ def search_jobs(title, size = 5)
   
   begin
     results = TartaAPI::JobSearchService.search_jobs(request)
-    jobs = results.fetch("jobs", [])
+    jobs = results[:jobs] || []
 
     if jobs.empty?
       puts "No job results found."
@@ -51,14 +51,14 @@ def search_jobs(title, size = 5)
 
     puts "Job Search Results:"
     jobs.each do |job|
-      job_name = job.fetch("name", "N/A")
-      company = job.fetch("companyName", "N/A")
-      location = job.fetch("location", {})
-      city = location.fetch("city", "Unknown")
-      state = location.fetch("state", "Unknown")
-      country = location.fetch("country", "Unknown")
-      source = job.fetch("feed", "N/A")
-      posted_date = job.fetch("created", "N/A")
+      job_name = job[:name] || "N/A"
+      company = job[:companyName] || "N/A"
+      location = job[:location] || {}
+      city = location[:city] || "Unknown"
+      state = location[:state] || "Unknown"
+      country = location[:country] || "Unknown"
+      source = job[:feed] || "N/A"
+      posted_date = job[:created] || "N/A"
 
       puts "Job: #{job_name} at #{company}"
       puts "Location: #{city}, #{state}, #{country}"
@@ -66,13 +66,12 @@ def search_jobs(title, size = 5)
       puts "Posted: #{posted_date}\n"
     end
 
-  rescue => e
-    puts "Error fetching job results: #{e}"
+  rescue StandardError => e
+    puts "Error fetching job results: #{e.message}"
   end
 end
 
-search_jobs("ruby", size: 2)
-
+search_jobs("ruby", 2)
 ```
 
 ## Key Features
